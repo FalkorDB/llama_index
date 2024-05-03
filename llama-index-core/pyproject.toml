@@ -116,7 +116,7 @@ query_tools = [
 ]
 
 [tool.poetry.group.dev.dependencies]
-black = {extras = ["jupyter"], version = ">=23.7.0,<=24.3.0"}
+black = {extras = ["jupyter"], version = ">=23.7.0,<=24.4.2"}
 boto3 = "1.33.6"  # needed for tests
 botocore = ">=1.33.13"
 codespell = {extras = ["toml"], version = ">=v2.2.6"}
