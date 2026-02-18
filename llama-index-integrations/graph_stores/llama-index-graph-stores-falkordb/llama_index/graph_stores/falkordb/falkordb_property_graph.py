@@ -270,7 +270,7 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
                 MERGE (target {{id: $data.target_id}})
                 ON CREATE SET target:Chunk
                 WITH source, target
-                CREATE (source)-[r:`{param["label"]}`]->(target)
+                MERGE (source)-[r:`{param["label"]}`]->(target)
                 SET r += $data.properties
                 RETURN count(*)
                 """,
