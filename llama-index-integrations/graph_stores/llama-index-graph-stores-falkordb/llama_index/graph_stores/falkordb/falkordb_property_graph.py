@@ -128,6 +128,8 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
         database: str = "falkor",
         refresh_schema: bool = True,
         sanitize_query_output: bool = True,
+        embedding_dimension: int = 1536,
+        create_indexes: bool = True,
         **falkordb_kwargs: Any,
     ) -> None:
         self.sanitize_query_output = sanitize_query_output
@@ -135,6 +137,14 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
         self._graph = self._driver.select_graph(database)
         self._database = database
         self.structured_schema = {}
+        if create_indexes:
+            try:
+                self.structured_query(
+                    f"CREATE VECTOR INDEX FOR (n:`{BASE_ENTITY_LABEL}`) ON (n.embedding) "
+                    f"OPTIONS {{dimension:{embedding_dimension}, similarityFunction:'cosine'}}"
+                )
+            except Exception:
+                pass  # Index may already exist
         if refresh_schema:
             self.refresh_schema()
 
@@ -503,21 +513,37 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
             else "1 = 1"
         )
 
-        data = self.structured_query(
-            f"""MATCH (e:`__Entity__`)
-            WHERE e.embedding IS NOT NULL AND ({filters})
-            WITH e, vec.euclideanDistance(e.embedding, vecf32($embedding)) AS score
-            ORDER BY score LIMIT $limit
-            RETURN e.id AS name,
-               [l in labels(e) WHERE l <> '__Entity__' | l][0] AS type,
-               e{{.* , embedding: Null, name: Null, id: Null}} AS properties,
-               score""",
-            param_map={
-                "embedding": query.query_embedding,
-                "dimension": len(query.query_embedding),
-                "limit": query.similarity_top_k,
-            },
-        )
+        if not query.filters:
+            # Use indexed vector search when no filters are applied
+            data = self.structured_query(
+                f"""CALL db.idx.vector.queryNodes('{BASE_ENTITY_LABEL}', 'embedding', $limit, vecf32($embedding))
+                YIELD entity AS e, score
+                RETURN e.id AS name,
+                   [l in labels(e) WHERE l <> '__Entity__' | l][0] AS type,
+                   e{{.* , embedding: Null, name: Null, id: Null}} AS properties,
+                   score""",
+                param_map={
+                    "embedding": query.query_embedding,
+                    "limit": query.similarity_top_k,
+                },
+            )
+        else:
+            # Fall back to brute-force cosine similarity with filters
+            data = self.structured_query(
+                f"""MATCH (e:`{BASE_ENTITY_LABEL}`)
+                WHERE e.embedding IS NOT NULL AND ({filters})
+                WITH e, vec.cosineSimilarity(e.embedding, vecf32($embedding)) AS score
+                ORDER BY score DESC LIMIT $limit
+                RETURN e.id AS name,
+                   [l in labels(e) WHERE l <> '__Entity__' | l][0] AS type,
+                   e{{.* , embedding: Null, name: Null, id: Null}} AS properties,
+                   score""",
+                param_map={
+                    "embedding": query.query_embedding,
+                    "dimension": len(query.query_embedding),
+                    "limit": query.similarity_top_k,
+                },
+            )
         data = data if data else []
 
         nodes = []
