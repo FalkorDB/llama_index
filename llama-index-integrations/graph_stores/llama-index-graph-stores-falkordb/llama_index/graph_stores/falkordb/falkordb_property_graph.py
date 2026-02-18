@@ -294,6 +294,8 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
             params["ids"] = ids
 
         if properties:
+            if ids:
+                cypher_statement += " AND "
             prop_list = []
             for i, prop in enumerate(properties):
                 prop_list.append(f"e.`{prop}` = $property_{i}")
@@ -354,10 +356,14 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
             params["entity_names"] = entity_names
 
         if ids:
+            if entity_names:
+                cypher_statement += " AND "
             cypher_statement += "e.id in $ids "
             params["ids"] = ids
 
         if properties:
+            if entity_names or ids:
+                cypher_statement += " AND "
             prop_list = []
             for i, prop in enumerate(properties):
                 prop_list.append(f"e.`{prop}` = $property_{i}")
