@@ -1,4 +1,5 @@
-from typing import Any, List, Dict, Optional, Tuple
+from typing import Any, List, Dict, Optional, Tuple, Type
+from types import TracebackType
 
 from llama_index.core.graph_stores.prompts import DEFAULT_CYPHER_TEMPALTE
 from llama_index.core.graph_stores.types import (
@@ -609,6 +610,32 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
                 "\n".join(formatted_rels),
             ]
         )
+
+    def close(self) -> None:
+        """Explicitly close the FalkorDB connection."""
+        if hasattr(self, "_driver") and self._driver is not None:
+            self._driver.close()
+            self._driver = None
+
+    def __enter__(self) -> "FalkorDBPropertyGraphStore":
+        """Enter the runtime context for the FalkorDB graph connection."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        """Exit the runtime context, ensuring the connection is closed."""
+        self.close()
+
+    def __del__(self) -> None:
+        """Destructor fallback to ensure connection cleanup."""
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def switch_graph(self, graph_name: str) -> None:
         """
