@@ -42,6 +42,7 @@ EXCLUDED_RELS = []
 EXHAUSTIVE_SEARCH_LIMIT = 10000
 # Threshold for returning all available prop values in graph schema
 DISTINCT_VALUE_LIMIT = 10
+CHUNK_SIZE = 1000
 
 node_properties_query = """
 MATCH (n)
@@ -205,20 +206,22 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
                 pass
 
         if chunk_dicts:
-            self.structured_query(
-                """
-                UNWIND $data AS row
-                MERGE (c:Chunk {id: row.id})
-                SET c.text = row.text
-                WITH c, row
-                SET c += row.properties
-                WITH c, row.embedding AS embedding
-                WHERE embedding IS NOT NULL
-                SET c.embedding = vecf32(embedding)
-                RETURN count(*)
-                """,
-                param_map={"data": chunk_dicts},
-            )
+            for index in range(0, len(chunk_dicts), CHUNK_SIZE):
+                chunked_params = chunk_dicts[index : index + CHUNK_SIZE]
+                self.structured_query(
+                    """
+                    UNWIND $data AS row
+                    MERGE (c:Chunk {id: row.id})
+                    SET c.text = row.text
+                    WITH c, row
+                    SET c += row.properties
+                    WITH c, row.embedding AS embedding
+                    WHERE embedding IS NOT NULL
+                    SET c.embedding = vecf32(embedding)
+                    RETURN count(*)
+                    """,
+                    param_map={"data": chunked_params},
+                )
 
         if entity_dicts:
             for entity_dict in entity_dicts:
@@ -237,26 +240,19 @@ class FalkorDBPropertyGraphStore(PropertyGraphStore):
                         SET e.embedding = vecf32($data.embedding)
                         RETURN count(*) AS count
                     }}
+                    WITH e
+                    CALL {{
+                        WITH e
+                        WITH e
+                        WHERE $data.properties.triplet_source_id IS NOT NULL
+                        MERGE (c:Chunk {{id: $data.properties.triplet_source_id}})
+                        MERGE (e)<-[:MENTIONS]-(c)
+                        RETURN count(*) AS count
+                    }}
                     RETURN count(e) AS cnt
                     """,
                     param_map={"data": entity_dict},
                 )
-                # Create MENTIONS relationship if entity has triplet_source_id
-                triplet_source_id = entity_dict.get("properties", {}).get(
-                    "triplet_source_id"
-                )
-                if triplet_source_id:
-                    self.structured_query(
-                        """
-                        MATCH (e:`__Entity__` {id: $entity_id})
-                        MERGE (c:Chunk {id: $chunk_id})
-                        MERGE (e)<-[:MENTIONS]-(c)
-                        """,
-                        param_map={
-                            "entity_id": entity_dict["id"],
-                            "chunk_id": triplet_source_id,
-                        },
-                    )
 
     def upsert_relations(self, relations: List[Relation]) -> None:
         """Add relations."""
