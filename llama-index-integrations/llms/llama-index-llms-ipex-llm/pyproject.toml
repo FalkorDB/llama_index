@@ -32,7 +32,7 @@ requires-python = ">=3.10,<3.12"
 readme = "README.md"
 license = "MIT"
 dependencies = [
-    "llama-index-core>=0.10.41,<0.11",
+    "llama-index-core>=0.10.41,<0.15",
     "ipex-llm[llama-index]>=2.1.0b20240529",
 ]
 
