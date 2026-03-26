@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.9, <4.0"
 resolution-markers = [
     "python_full_version >= '3.11'",
@@ -296,19 +296,20 @@ wheels = [
 
 [[package]]
 name = "banks"
-version = "2.2.0"
+version = "2.4.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "deprecated" },
     { name = "eval-type-backport", marker = "python_full_version < '3.10'" },
+    { name = "filetype" },
     { name = "griffe" },
     { name = "jinja2" },
     { name = "platformdirs" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7d/f8/25ef24814f77f3fd7f0fd3bd1ef3749e38a9dbd23502fbb53034de49900c/banks-2.2.0.tar.gz", hash = "sha256:d1446280ce6e00301e3e952dd754fd8cee23ff277d29ed160994a84d0d7ffe62", size = 179052, upload-time = "2025-07-18T16:28:26.892Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/5d/54c79aaaa9aa1278af24cae98d81d6ef635ad840f046bc2ccb5041ddeb1b/banks-2.4.1.tar.gz", hash = "sha256:8cbf1553f14c44d4f7e9c2064ad9212ce53ee4da000b2f8308d548b60db56655", size = 188033, upload-time = "2026-02-17T11:21:14.855Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/d6/f9168956276934162ec8d48232f9920f2985ee45aa7602e3c6b4bc203613/banks-2.2.0-py3-none-any.whl", hash = "sha256:963cd5c85a587b122abde4f4064078def35c50c688c1b9d36f43c92503854e7d", size = 29244, upload-time = "2025-07-18T16:28:27.835Z" },
+    { url = "https://files.pythonhosted.org/packages/b8/5a/f38b49e8b225b0c774e97c9495e52ab9ccdf6d82bde68c513bd736820eb2/banks-2.4.1-py3-none-any.whl", hash = "sha256:40e6d9b6e9b69fb403fa31f2853b3297e4919c1b6f2179b2119d2d4473c6ed13", size = 35032, upload-time = "2026-02-17T11:21:13.236Z" },
 ]
 
 [[package]]
@@ -1594,7 +1595,7 @@ wheels = [
 
 [[package]]
 name = "llama-index-core"
-version = "0.14.0"
+version = "0.14.15"
 source = { directory = "../../../llama-index-core" }
 dependencies = [
     { name = "aiohttp" },
@@ -1625,6 +1626,7 @@ dependencies = [
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "tenacity" },
     { name = "tiktoken" },
+    { name = "tinytag" },
     { name = "tqdm" },
     { name = "typing-extensions" },
     { name = "typing-inspect" },
@@ -1635,7 +1637,7 @@ dependencies = [
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.8.6,<4" },
     { name = "aiosqlite" },
-    { name = "banks", specifier = ">=2.2.0,<3" },
+    { name = "banks", specifier = ">=2.3.0,<3" },
     { name = "dataclasses-json" },
     { name = "deprecated", specifier = ">=1.2.9.3" },
     { name = "dirtyjson", specifier = ">=1.0.8,<2" },
@@ -1643,7 +1645,7 @@ requires-dist = [
     { name = "filetype", specifier = ">=1.2.0,<2" },
     { name = "fsspec", specifier = ">=2023.5.0" },
     { name = "httpx" },
-    { name = "llama-index-workflows", specifier = ">=2,<3" },
+    { name = "llama-index-workflows", specifier = ">=2,!=2.9.0,<3" },
     { name = "nest-asyncio", specifier = ">=1.5.8,<2" },
     { name = "networkx", specifier = ">=3.0" },
     { name = "nltk", specifier = ">3.8.1" },
@@ -1657,6 +1659,7 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=1.4.49" },
     { name = "tenacity", specifier = ">=8.2.0,!=8.4.0,<10.0.0" },
     { name = "tiktoken", specifier = ">=0.7.0" },
+    { name = "tinytag", specifier = ">=2.2.0" },
     { name = "tqdm", specifier = ">=4.66.1,<5" },
     { name = "typing-extensions", specifier = ">=4.5.0" },
     { name = "typing-inspect", specifier = ">=0.8.0" },
@@ -1671,6 +1674,7 @@ dev = [
     { name = "codespell", extras = ["toml"], specifier = ">=2.2.6" },
     { name = "diff-cover", specifier = ">=9.2.0" },
     { name = "llama-cloud", specifier = ">=0.0.6" },
+    { name = "llama-index-llms-openai", directory = "../../llms/llama-index-llms-openai" },
     { name = "mypy", specifier = "==1.11.0" },
     { name = "openai" },
     { name = "pandas" },
@@ -1681,6 +1685,7 @@ dev = [
     { name = "pytest-cov", specifier = "~=5.0" },
     { name = "pytest-dotenv", specifier = "==0.5.2" },
     { name = "pytest-mock", specifier = "==3.11.1" },
+    { name = "pytest-timeout", specifier = ">=2.4.0" },
     { name = "rake-nltk", specifier = "==1.0.6" },
     { name = "ruff", specifier = "==0.11.11" },
     { name = "tree-sitter" },
@@ -1705,7 +1710,7 @@ wheels = [
 
 [[package]]
 name = "llama-index-readers-service-now"
-version = "0.2.1"
+version = "0.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "llama-index-core" },
@@ -3274,7 +3279,7 @@ wheels = [
 
 [[package]]
 name = "requests"
-version = "2.32.4"
+version = "2.32.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "certifi" },
@@ -3282,9 +3287,9 @@ dependencies = [
     { name = "idna" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e1/0a/929373653770d8a0d7ea76c37de6e41f11eb07559b103b1c02cafb3f7cf8/requests-2.32.4.tar.gz", hash = "sha256:27d0316682c8a29834d3264820024b62a36942083d52caf2f14c0591336d3422", size = 135258, upload-time = "2025-06-09T16:43:07.34Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c9/74/b3ff8e6c8446842c3f5c837e9c3dfcfe2018ea6ecef224c710c85ef728f4/requests-2.32.5.tar.gz", hash = "sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf", size = 134517, upload-time = "2025-08-18T20:46:02.573Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/e4/56027c4a6b4ae70ca9de302488c5ca95ad4a39e190093d6c1a8ace08341b/requests-2.32.4-py3-none-any.whl", hash = "sha256:27babd3cda2a6d50b30443204ee89830707d396671944c998b5975b031ac2b2c", size = 64847, upload-time = "2025-06-09T16:43:05.728Z" },
+    { url = "https://files.pythonhosted.org/packages/1e/db/4254e3eabe8020b458f1a747140d32277ec7a271daf1d235b70dc0b4e6e3/requests-2.32.5-py3-none-any.whl", hash = "sha256:2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6", size = 64738, upload-time = "2025-08-18T20:46:00.542Z" },
 ]
 
 [[package]]
@@ -3676,6 +3681,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7a/fd/7a5ee21fd08ff70d3d33a5781c255cbe779659bd03278feb98b19ee550f4/tinycss2-1.4.0.tar.gz", hash = "sha256:10c0972f6fc0fbee87c3edb76549357415e94548c1ae10ebccdea16fb404a9b7", size = 87085, upload-time = "2024-10-24T14:58:29.895Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e6/34/ebdc18bae6aa14fbee1a08b63c015c72b64868ff7dae68808ab500c492e2/tinycss2-1.4.0-py3-none-any.whl", hash = "sha256:3a49cf47b7675da0b15d0c6e1df8df4ebd96e9394bb905a5775adb0d884c5289", size = 26610, upload-time = "2024-10-24T14:58:28.029Z" },
+]
+
+[[package]]
+name = "tinytag"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/59/8a8cb2331e2602b53e4dc06960f57d1387a2b18e7efd24e5f9cb60ea4925/tinytag-2.2.1.tar.gz", hash = "sha256:e6d06610ebe7cd66fd07be2d3b9495914ab32654a5e47657bb8cd44c2484523c", size = 38214, upload-time = "2026-03-15T18:48:01.11Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/34/d50e338631baaf65ec5396e70085e5de0b52b24b28db1ffbc1c6e82190dc/tinytag-2.2.1-py3-none-any.whl", hash = "sha256:ed8b1e6d25367937e3321e054f4974f9abfde1a3e0a538824c87da377130c2b6", size = 32927, upload-time = "2026-03-15T18:47:59.613Z" },
 ]
 
 [[package]]
